@@ -1,20 +1,33 @@
-const User = require('../models/user');
+const Pasien = require('../models/pasien');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 
+// REGISTER
 exports.register = async (req, res) => {
   try {
     const { nama, email, password, umur } = req.body;
     console.log('[REGISTER] Data diterima:', { nama, email, umur });
 
-    const existing = await User.findOne({ email });
+    // Cek jika email sudah terdaftar
+    const existing = await Pasien.findOne({ email });
     if (existing) {
       console.warn('[REGISTER] Email sudah terdaftar:', email);
       return res.status(400).json({ error: 'Email sudah terdaftar' });
     }
 
-    const newUser = new User({ nama, email, password, umur });
-    await newUser.save();
-    console.log('[REGISTER] User berhasil disimpan:', newUser);
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Simpan data pasien
+    const newPasien = new Pasien({
+      nama,
+      email,
+      password: hashedPassword,
+      umur,
+    });
+
+    await newPasien.save();
+    console.log('[REGISTER] Pasien berhasil disimpan:', newPasien);
 
     return res.status(201).json({ message: 'Registrasi berhasil' });
   } catch (err) {
@@ -23,27 +36,44 @@ exports.register = async (req, res) => {
   }
 };
 
+// LOGIN
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('[LOGIN] Data masuk:', { email, password });
+    console.log('[LOGIN] Data masuk:', { email });
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      console.warn('[LOGIN] User tidak ditemukan:', email);
-      return res.status(404).json({ error: 'User tidak ditemukan' });
+    // Cari pasien berdasarkan email
+    const pasien = await Pasien.findOne({ email });
+    if (!pasien) {
+      console.warn('[LOGIN] Pasien tidak ditemukan:', email);
+      return res.status(404).json({ error: 'Pasien tidak ditemukan' });
     }
 
-    const isMatch = await user.comparePassword(password);
+    // Cek password
+    const isMatch = await bcrypt.compare(password, pasien.password);
     if (!isMatch) {
       console.warn('[LOGIN] Password salah untuk:', email);
       return res.status(400).json({ error: 'Password salah' });
     }
 
-    const token = jwt.sign({ id: user._id }, 'SECRET_KEY', { expiresIn: '1d' });
-    console.log('[LOGIN] Login sukses untuk:', user._id);
+    // Buat token JWT
+    const token = jwt.sign({ id: pasien._id }, 'SECRET_KEY', {
+      expiresIn: '1d',
+    });
 
-    return res.json({ token, user });
+    console.log('[LOGIN] Login sukses untuk:', pasien._id);
+
+    // Kirim token dan data pasien dalam struktur yang sesuai untuk Flutter
+    return res.status(200).json({
+      success: true,
+      token,
+      user: {
+        _id: pasien._id,
+        nama: pasien.nama,
+        email: pasien.email,
+        umur: pasien.umur,
+      },
+    });
   } catch (err) {
     console.error('[LOGIN] Error saat login:', err.message);
     return res.status(500).json({ error: 'Terjadi kesalahan server' });

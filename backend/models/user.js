@@ -36,7 +36,7 @@ userSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (err) {
-    next(err); // lempar error ke middleware
+    return next(err); // lempar error ke middleware
   }
 });
 

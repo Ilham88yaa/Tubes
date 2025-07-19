@@ -7,6 +7,15 @@ const pasienSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  email: {
+    type: String,
+    required: true,
+    unique: true, // agar tidak ada email ganda
+  },
+  password: {
+    type: String,
+    required: true,
+  },
   umur: {
     type: Number,
     required: true,
