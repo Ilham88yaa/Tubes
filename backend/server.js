@@ -1,17 +1,30 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const dotenv = require('dotenv');
 const pasienRoutes = require('./routes/pasien_routes');
 const authRoutes = require('./routes/auth_routes');
-require('dotenv').config();
+const bookingRoutes = require('./routes/booking_routes');
+const jadwalRoutes = require('./routes/jadwal_routes');
 
+dotenv.config();
 const app = express();
 
 // ✅ Middleware
-app.use(cors()); // Izinkan akses dari semua origin
-app.use(express.json()); // Parsing JSON body dari request
+app.use(cors({
+  origin: '*', // Bisa diatur ke alamat frontend spesifik jika perlu
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type'],
+}));
+app.use(express.json()); // Untuk parsing JSON dari body request
 
-// ✅ Route root (opsional, untuk testing)
+// ✅ Logging permintaan masuk (untuk debug)
+app.use((req, res, next) => {
+  console.log(`[${req.method}] ${req.originalUrl}`);
+  next();
+});
+
+// ✅ Route root (untuk tes)
 app.get('/', (req, res) => {
   res.send('🎉 Meditech Backend API is running!');
 });
@@ -19,6 +32,8 @@ app.get('/', (req, res) => {
 // ✅ API Routes
 app.use('/api/pasien', pasienRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/booking', bookingRoutes);
+app.use('/jadwal', jadwalRoutes);
 
 // ✅ Koneksi MongoDB
 mongoose.connect(process.env.MONGO_URI, {
