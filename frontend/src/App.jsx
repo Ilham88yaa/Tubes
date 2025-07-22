@@ -1,13 +1,15 @@
-import React from 'react';
-import PasienList from './pages/pasien_list';
+import React from "react";
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import UserList from "./pages/user_list";
 
-function App() {
+function App(){
   return (
-    <div>
-      <h1>Data Pasien</h1>
-      <PasienList />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<UserList />} />
+        </Routes>
+    </Router>
   );
-}
+  }
 
-export default App;
+  export default App;

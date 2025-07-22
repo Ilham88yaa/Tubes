@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-// Skema User
 const userSchema = new mongoose.Schema({
   nama: {
     type: String,
@@ -21,29 +20,49 @@ const userSchema = new mongoose.Schema({
   },
   umur: {
     type: Number,
-    required: [true, 'Umur wajib diisi'],
     min: [0, 'Umur tidak valid'],
   },
-}, {
-  timestamps: true, // otomatis menambahkan createdAt dan updatedAt
-});
+  tanggal_lahir: Date,
+  alamat: String,
+  no_hp: String,
+  role: {
+    type: String,
+    enum: ['pasien', 'dokter', 'admin'],
+    default: 'pasien',
+  },
 
-// 🔐 Hash password sebelum menyimpan user
+  // HANYA digunakan kalau role === 'pasien'
+  appointments: [
+    {
+      date: String,
+      doctor: String,
+    }
+  ],
+  medicalRecords: [
+    {
+      title: String,
+      description: String,
+      date: String,
+    }
+  ]
+
+}, { timestamps: true });
+
+// 🔐 Hash password sebelum menyimpan
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next(); // jika password tidak berubah, lanjutkan
+  if (!this.isModified('password')) return next();
   try {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (err) {
-    return next(err); // lempar error ke middleware
+    return next(err);
   }
 });
 
-// 🔐 Method untuk membandingkan password saat login
+// 🔐 Method membandingkan password
 userSchema.methods.comparePassword = function (inputPassword) {
   return bcrypt.compare(inputPassword, this.password);
 };
 
-// Export model
 module.exports = mongoose.model('User', userSchema);

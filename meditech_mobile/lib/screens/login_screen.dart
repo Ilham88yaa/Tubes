@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/pasien.dart';
-import '../services/pasien_service.dart';
+import '../services/user_service.dart';
+import '../services/auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -27,12 +28,12 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final result = await AuthService.login(
+      final result = await PasienService.login(
         _emailController.text.trim(),
         _passwordController.text.trim(),
       );
 
-      if (result['success']) {
+      if (result['success'] == true) {
         final Pasien currentPasien = Pasien.fromJson(result['user']);
 
         final prefs = await SharedPreferences.getInstance();
@@ -49,7 +50,10 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } else {
         setState(() {
-          _errorMessage = result['message'] ?? 'Login gagal.';
+          _errorMessage =
+              result['message'] ??
+              result['error'] ??
+              'Login gagal. Cek email & password.';
         });
       }
     } catch (e) {

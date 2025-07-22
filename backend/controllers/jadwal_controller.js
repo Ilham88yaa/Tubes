@@ -1,11 +1,28 @@
 const Jadwal = require('../models/jadwal');
 
-// [POST] /jadwal
+// [POST] /jadwal - Buat jadwal baru
 exports.createJadwal = async (req, res) => {
   try {
-    const { dokter, spesialis, tanggal, waktu } = req.body; // Sesuaikan nama field
+    const {
+      nama = '',           // opsional (dari versi 2)
+      dokter,
+      spesialis = '',      // opsional (dari versi 1)
+      tanggal,
+      waktu,               // versi 1
+      jam                  // versi 2 (opsional)
+    } = req.body;
 
-    const newJadwal = new Jadwal({ dokter, spesialis, tanggal, waktu });
+    // Gunakan waktu || jam, tergantung yang dikirim
+    const finalWaktu = waktu || jam || '';
+
+    const newJadwal = new Jadwal({
+      nama,
+      dokter,
+      spesialis,
+      tanggal,
+      waktu: finalWaktu
+    });
+
     await newJadwal.save();
 
     console.log('[JADWAL] Jadwal berhasil disimpan:', newJadwal);
@@ -16,7 +33,7 @@ exports.createJadwal = async (req, res) => {
   }
 };
 
-// [GET] /jadwal
+// [GET] /jadwal - Ambil semua jadwal
 exports.getAllJadwal = async (req, res) => {
   try {
     const jadwalList = await Jadwal.find().sort({ tanggal: 1 });
