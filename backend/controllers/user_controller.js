@@ -1,73 +1,44 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 
-// =====================
 // 🔐 REGISTER
-// =====================
 exports.register = async (req, res) => {
   try {
     const { nama, email, password, umur, tanggal_lahir, alamat, no_hp, role } = req.body;
-    console.log('[REGISTER] Data masuk:', { nama, email, role });
 
-    // Validasi field wajib
     if (!nama || !email || !password) {
       return res.status(400).json({ error: 'Nama, email, dan password wajib diisi' });
     }
 
-    // Cek email
     const existing = await User.findOne({ email });
     if (existing) {
-      console.warn('[REGISTER] Email sudah terdaftar:', email);
       return res.status(400).json({ error: 'Email sudah terdaftar' });
     }
 
-    // Buat user baru
     const newUser = new User({
-      nama,
-      email,
-      password,
-      umur,
-      tanggal_lahir,
-      alamat,
-      no_hp,
-      role: role || 'pasien', // default: pasien
+      nama, email, password, umur, tanggal_lahir, alamat, no_hp, role: role || 'pasien',
     });
 
     await newUser.save();
-    console.log('[REGISTER] User berhasil disimpan:', newUser);
 
     res.status(201).json({ message: 'Registrasi berhasil' });
   } catch (err) {
-    console.error('[REGISTER] Gagal registrasi:', err.message);
     res.status(500).json({ error: 'Terjadi kesalahan server' });
   }
 };
 
-// =====================
 // 🔑 LOGIN
-// =====================
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('[LOGIN] Data masuk:', { email });
 
     const user = await User.findOne({ email });
-    if (!user) {
-      console.warn('[LOGIN] User tidak ditemukan:', email);
-      return res.status(404).json({ error: 'User tidak ditemukan' });
-    }
+    if (!user) return res.status(404).json({ error: 'User tidak ditemukan' });
 
     const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      console.warn('[LOGIN] Password salah:', email);
-      return res.status(400).json({ error: 'Password salah' });
-    }
+    if (!isMatch) return res.status(400).json({ error: 'Password salah' });
 
-    const token = jwt.sign({ id: user._id, role: user.role }, 'SECRET_KEY', {
-      expiresIn: '1d',
-    });
-
-    console.log('[LOGIN] Login sukses:', user._id);
+    const token = jwt.sign({ id: user._id, role: user.role }, 'SECRET_KEY', { expiresIn: '1d' });
 
     res.status(200).json({
       success: true,
@@ -81,14 +52,11 @@ exports.login = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error('[LOGIN] Gagal login:', err.message);
     res.status(500).json({ error: 'Terjadi kesalahan server' });
   }
 };
 
-// =====================
 // 📋 GET SEMUA PASIEN
-// =====================
 exports.getAllPasien = async (req, res) => {
   try {
     const pasienList = await User.find({ role: 'pasien' });
@@ -98,9 +66,7 @@ exports.getAllPasien = async (req, res) => {
   }
 };
 
-// =====================
 // 📝 UPDATE USER
-// =====================
 exports.updateUser = async (req, res) => {
   try {
     const updated = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -111,14 +77,32 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// =====================
 // ❌ DELETE USER
-// =====================
 exports.deleteUser = async (req, res) => {
   try {
     const deleted = await User.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ message: 'User tidak ditemukan' });
     res.json({ message: 'User berhasil dihapus' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// 🧑‍⚕️ GET DOKTER
+exports.getAllDokter = async (req, res) => {
+  try {
+    const dokter = await User.find({ role: 'dokter' }).select('-password');
+    res.json(dokter);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// 👨‍💼 GET ADMIN
+exports.getAllAdmin = async (req, res) => {
+  try {
+    const admin = await User.find({ role: 'admin' }).select('-password');
+    res.json(admin);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

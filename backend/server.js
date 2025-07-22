@@ -3,30 +3,30 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
-// Import route
+// Import routes
 const authRoutes = require('./routes/auth_routes');
 const bookingRoutes = require('./routes/booking_routes');
 const jadwalRoutes = require('./routes/jadwal_routes');
 const rekamRoutes = require('./routes/rekam_routes');
-const userRoutes = require('./routes/user_routes'); // ✅ Tambahan untuk user registration
+const userRoutes = require('./routes/user_routes');
+const konsultasiRoute = require('./routes/konsultasi');
 
 dotenv.config();
 const app = express();
 
-// ✅ Middleware CORS yang lebih lengkap
+// Middleware CORS
 app.use(cors({
-  origin: (origin, callback) => {
-  callback(null, true); // izinkan semua origin
-},
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
   credentials: true
 }));
 
-app.use(express.json({ limit: '10mb' })); // Untuk parsing JSON dari body request
-app.use(express.urlencoded({ extended: true })); // Untuk parsing form data
+// Middleware untuk parsing body request
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
 
-// ✅ Logging untuk debug
+// Logger
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
   if (req.body && Object.keys(req.body).length > 0) {
@@ -35,7 +35,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// ✅ Root route untuk cek API hidup
+// Root route
 app.get('/', (req, res) => {
   res.json({
     message: '🎉 Meditech Backend API is running!',
@@ -45,32 +45,32 @@ app.get('/', (req, res) => {
   });
 });
 
-// ✅ Health check endpoint
+// Health check
 app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     message: 'Server is running',
     database: mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected',
     timestamp: new Date().toISOString()
   });
 });
 
-// ✅ API Routes dengan prefix yang konsisten
+// Main routes
 app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoutes); // ✅ Route untuk user registration & management
-app.use('/api/booking', bookingRoutes); // ✅ Tambah prefix /api
-app.use('/api/jadwal', jadwalRoutes); // ✅ Tambah prefix /api
+app.use('/api/user', userRoutes);
+app.use('/api/booking', bookingRoutes);
+app.use('/api/jadwal', jadwalRoutes);
 app.use('/api/rekam_medis', rekamRoutes);
+app.use('/api/konsultasi', konsultasiRoute);
 
-// ✅ Backward compatibility routes (untuk yang sudah ada)
+// Optional: backward compatibility
 app.use('/booking', bookingRoutes);
 app.use('/jadwal', jadwalRoutes);
 
-// ✅ Error handling middleware
+// Error handler middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err.message);
   console.error('Stack:', err.stack);
-  
   res.status(err.status || 500).json({
     success: false,
     message: err.message || 'Internal Server Error',
@@ -78,7 +78,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// ✅ Handle 404 untuk route yang tidak ditemukan
+// 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
@@ -88,8 +88,12 @@ app.use('*', (req, res) => {
       'GET /api/health',
       'POST /api/user/register',
       'POST /api/user/login',
-      'GET /api/user',
+      'GET /api/user/pasien',
+      'GET /api/user/dokter',
+      'GET /api/user/admin',
       'POST /api/user',
+      'PUT /api/user/:id',
+      'DELETE /api/user/:id',
       'GET /api/booking',
       'POST /api/booking',
       'GET /api/jadwal',
@@ -100,10 +104,10 @@ app.use('*', (req, res) => {
   });
 });
 
-// ✅ Koneksi ke MongoDB dengan better error handling
+// Connect MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
+  useUnifiedTopology: true
 })
 .then(() => {
   console.log('✅ MongoDB Connected successfully');
@@ -114,7 +118,6 @@ mongoose.connect(process.env.MONGO_URI, {
   process.exit(1);
 });
 
-// ✅ Handle MongoDB connection events
 mongoose.connection.on('disconnected', () => {
   console.log('⚠️  MongoDB disconnected');
 });
@@ -123,7 +126,7 @@ mongoose.connection.on('reconnected', () => {
   console.log('🔄 MongoDB reconnected');
 });
 
-// ✅ Graceful shutdown
+// Graceful shutdown
 process.on('SIGINT', async () => {
   console.log('\n🛑 Shutting down gracefully...');
   await mongoose.connection.close();
@@ -131,18 +134,11 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-// ✅ Jalankan server
+// Jalankan server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`🌐 Server accessible on all network interfaces`);
   console.log(`📱 Mobile access: http://[YOUR_IP]:${PORT}`);
   console.log(`🔍 API Documentation: http://localhost:${PORT}/api/health`);
-  console.log('📡 Available endpoints:');
-  console.log('   - POST /api/user/register (User registration)');
-  console.log('   - POST /api/user/login (User login)');
-  console.log('   - GET  /api/user (Get patients)');
-  console.log('   - POST /api/user (Create patient)');
-  console.log('   - GET  /api/booking (Get bookings)');
-  console.log('   - POST /api/booking (Create booking)');
 });

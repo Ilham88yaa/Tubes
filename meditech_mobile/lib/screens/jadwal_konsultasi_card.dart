@@ -1,5 +1,3 @@
-// lib/screens/jadwal_konsultasi_card.dart
-
 import 'package:flutter/material.dart';
 import '../models/konsultasi_model.dart';
 
@@ -11,22 +9,22 @@ class JadwalKonsultasiCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 2,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              konsultasi.dokter,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              "Pasien: ${konsultasi.namaPasien}",
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 4),
-            Text("Spesialis: ${konsultasi.spesialis}"),
+            Text("Dokter: ${konsultasi.namaDokter}"),
             Text("Tanggal: ${konsultasi.tanggal}"),
-            Text("Waktu: ${konsultasi.waktu}"),
+            Text("Jam: ${konsultasi.jam}"),
+            const SizedBox(height: 8),
+            Text("Keluhan: ${konsultasi.keluhan}"),
           ],
         ),
       ),

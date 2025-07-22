@@ -1,25 +1,38 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/user_controller'); // ✅ konsisten pakai 1
+const userController = require('../controllers/user_controller'); // ✅ konsisten import controller
 
-// Cek route aktif
+// =====================
+// 🌐 TEST ROUTE
+// =====================
 router.get('/test', (req, res) => {
   res.json({ success: true, message: 'Route /api/user/test aktif' });
 });
 
-// Register user
+// =====================
+// 🔐 REGISTER
+// =====================
 router.post('/register', userController.register);
 
-// Login user
+// =====================
+// 🔑 LOGIN
+// =====================
 router.post('/login', userController.login);
 
-// Get semua pasien
+// =====================
+// 📋 GET all users by role
 router.get('/pasien', userController.getAllPasien);
+router.get('/dokter', userController.getAllDokter);
+router.get('/admin', userController.getAllAdmin);
 
-// Update user
-router.put('/:id', userController.updateUser); // ✅ pastikan controller ini ada
+// =====================
+// 📝 UPDATE USER
+// =====================
+router.put('/:id', userController.updateUser);
 
-// Hapus user
-router.delete('/:id', userController.deleteUser); // ✅ pastikan controller ini ada
+// =====================
+// ❌ DELETE USER
+// =====================
+router.delete('/:id', userController.deleteUser);
 
 module.exports = router;

@@ -15,33 +15,98 @@ class RiwayatBookingScreen extends StatelessWidget {
       ),
       body:
           bookingList.isEmpty
-              ? const Center(child: Text('Belum ada riwayat booking.'))
-              : ListView.builder(
-                itemCount: bookingList.length,
-                itemBuilder: (context, index) {
-                  final booking = bookingList[index];
-                  return Card(
-                    color: Colors.deepPurple[50],
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+              ? const Center(
+                child: Text(
+                  'Belum ada riwayat booking.',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              )
+              : Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Total Booking: ${bookingList.length}',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    const SizedBox(height: 12),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Table(
+                        border: TableBorder.all(color: Colors.grey.shade300),
+                        defaultVerticalAlignment:
+                            TableCellVerticalAlignment.middle,
+                        columnWidths: const {
+                          0: FlexColumnWidth(2),
+                          1: FlexColumnWidth(3),
+                          2: FlexColumnWidth(2),
+                          3: FlexColumnWidth(2),
+                        },
                         children: [
-                          Text(
-                            booking.nama,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          const TableRow(
+                            decoration: BoxDecoration(color: Color(0xFFEDE7F6)),
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  'Nama',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  'Dokter',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  'Tanggal',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(8),
+                                child: Text(
+                                  'Jam',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ],
                           ),
-                          Text('Dokter: ${booking.dokter}'),
-                          Text('Jadwal: ${booking.tanggal} jam ${booking.jam}'),
+                          ...bookingList.map(
+                            (booking) => TableRow(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Text(booking.nama),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Text(booking.dokter),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Text(booking.tanggal),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8),
+                                  child: Text(booking.jam),
+                                ),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  );
-                },
+                  ],
+                ),
               ),
     );
   }
