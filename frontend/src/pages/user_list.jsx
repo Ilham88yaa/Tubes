@@ -1,8 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { getAllUser, updateUser, deleteUser } from '../services/user_service';
 import {
-  Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Box, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle
+  Typography,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Box,
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle
 } from '@mui/material';
 
 const UserList = () => {
@@ -11,7 +24,14 @@ const UserList = () => {
   const [selectedUser, setSelectedUser] = useState(null);
 
   const fetchData = () => {
-    getAllUser().then(data => setUsers(data));
+    getAllUser()
+      .then(data => {
+        console.log('[DEBUG] User Data:', data);
+        setUsers(data);
+      })
+      .catch(err => {
+        console.error('Gagal fetch user:', err);
+      });
   };
 
   useEffect(() => {
@@ -57,7 +77,10 @@ const UserList = () => {
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>Daftar User</Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+        <Typography variant="h5">Daftar User</Typography>
+        <Button variant="contained" onClick={fetchData}>Refresh</Button>
+      </Box>
 
       <TableContainer component={Paper} elevation={3}>
         <Table>
@@ -75,10 +98,10 @@ const UserList = () => {
             {users.length > 0 ? (
               users.map((u) => (
                 <TableRow key={u._id}>
-                  <TableCell>{u.nama}</TableCell>
+                  <TableCell>{u.nama || u.name || '-'}</TableCell>
                   <TableCell>{u.email}</TableCell>
-                  <TableCell>{u.umur}</TableCell>
-                  <TableCell>{u.role}</TableCell>
+                  <TableCell>{u.umur || '-'}</TableCell>
+                  <TableCell>{u.role || '-'}</TableCell>
                   <TableCell>
                     <Button variant="outlined" size="small" onClick={() => handleEditClick(u)}>Edit</Button>{' '}
                     <Button variant="contained" color="error" size="small" onClick={() => handleDelete(u._id)}>Delete</Button>

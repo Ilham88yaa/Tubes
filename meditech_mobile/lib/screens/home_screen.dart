@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/pasien.dart';
+import '../models/booking.dart';
+import '../models/konsultasi_model.dart';
+import 'riwayat_konsultasi.dart';
 import 'booking_screen.dart';
 import 'rekam_medis_screen.dart';
 import 'profile_screen.dart';
@@ -17,6 +20,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  List<Booking> _bookingList = [];
+  List<Konsultasi> _konsultasiList = [];
+
+  void _addBooking(Booking newBooking) {
+    setState(() {
+      _bookingList.add(newBooking);
+      _currentIndex = 1; // Switch to Riwayat Booking tab after booking
+    });
+  }
 
   void _navigateTo(int index) {
     if (index == _currentIndex) return;
@@ -26,8 +38,34 @@ class _HomeScreenState extends State<HomeScreen> {
     Widget? destination;
     switch (index) {
       case 1:
-        destination = RiwayatBookingScreen(bookingList: []);
-        break;
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          builder:
+              (context) => SafeArea(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.schedule),
+                      title: const Text('Riwayat Konsultasi'),
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder:
+                                (context) => RiwayatKonsultasiScreen(
+                                  konsultasiList: _konsultasiList,
+                                ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+        );
+        return;
       case 2:
         destination = ProfileScreen(currentPasien: widget.currentPasien);
         break;
@@ -236,10 +274,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   label: 'Booking',
                   color: const Color(0xFF66BB6A),
                   iconColor: Colors.white,
-                  onTap: () {
-                    Navigator.of(
-                      context,
-                    ).push(_fadeRoute(const BookingScreen()));
+                  onTap: () async {
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder:
+                            (context) => BookingScreen(
+                              onBookingAdded: (Booking booking) {
+                                _addBooking(booking);
+                              },
+                            ),
+                      ),
+                    );
                   },
                 ),
                 _menuCard(
