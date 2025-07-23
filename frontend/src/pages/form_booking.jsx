@@ -1,44 +1,46 @@
-import React, { useState } from 'react';
 import { createJadwal } from '../services/jadwal_service';
 import { Box, Paper, TextField, Button, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { getAllBookings } from '../services/booking_service';
 
 export default function FormBooking() {
-  const [form, setForm] = useState({
-    nama: '',
-    dokter: '',
-    tanggal: '',
-    jam: ''
-  });
+  const [bookings, setBookings] = useState([]);
+    useEffect(() => {
+    fetchBookings();
+  }, []);
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const fetchBookings = async () => {
     try {
-      await createJadwal(form);
-      alert('Booking berhasil disimpan');
-      setForm({ nama: '', dokter: '', tanggal: '', jam: '' });
-    } catch (err) {
-      console.error(err);
-      alert('Gagal menyimpan booking');
+      const data = await getAllBookings();
+      setBookings(data);
+    } catch (error) {
+      console.error('Gagal ambil booking:', error);
     }
   };
 
   return (
-    <Paper sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>Form Booking Konsultasi</Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <TextField label="Nama Pasien" name="nama" value={form.nama} onChange={handleChange} required />
-        <TextField label="Dokter" name="dokter" value={form.dokter} onChange={handleChange} required />
-        <TextField label="Tanggal" type="date" name="tanggal" value={form.tanggal} onChange={handleChange} InputLabelProps={{ shrink: true }} required />
-        <TextField label="Jam" type="time" name="jam" value={form.jam} onChange={handleChange} InputLabelProps={{ shrink: true }} required />
-        <Button type="submit" variant="contained">Booking</Button>
-      </Box>
-    </Paper>
+    <div>
+      <h2>Data Booking Konsultasi</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Dokter</th>
+            <th>Tanggal</th>
+            <th>Jam</th>
+          </tr>
+        </thead>
+        <tbody>
+          {bookings.map((b, i) => (
+            <tr key={i}>
+              <td>{b.nama}</td>
+              <td>{b.dokter}</td>
+              <td>{b.tanggal}</td>
+              <td>{b.jam}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

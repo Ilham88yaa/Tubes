@@ -10,6 +10,7 @@ const jadwalRoutes = require('./routes/jadwal_routes');
 const rekamRoutes = require('./routes/rekam_routes');
 const userRoutes = require('./routes/user_routes');
 const konsultasiRoute = require('./routes/konsultasi');
+const adminRoutes = require('./routes/admin_routes');
 
 dotenv.config();
 const app = express();
@@ -62,6 +63,7 @@ app.use('/api/booking', bookingRoutes);
 app.use('/api/jadwal', jadwalRoutes);
 app.use('/api/rekam_medis', rekamRoutes);
 app.use('/api/konsultasi', konsultasiRoute);
+app.use('/api/admin', adminRoutes);
 
 // Optional: backward compatibility
 app.use('/booking', bookingRoutes);

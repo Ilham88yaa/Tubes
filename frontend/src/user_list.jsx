@@ -1,6 +1,10 @@
 import axios from 'axios';
 
 const API = 'http://localhost:5001/api/user';
+const token = localStorage.getItem('adminToken');
+const res = await axios.get('http://localhost:5001/api/user', {
+  headers: { Authorization: `Bearer ${token}` }
+});
 
 export const getAllPasien = async () => {
   const res = await axios.get(API);

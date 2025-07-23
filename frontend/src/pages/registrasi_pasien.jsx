@@ -5,7 +5,6 @@ import axios from 'axios';
 export default function RegistrasiPasien() {
   const [formData, setFormData] = useState({
     nama: '',
-    nik: '',
     tanggal_lahir: '',
     alamat: '',
     no_hp: ''
@@ -84,30 +83,6 @@ export default function RegistrasiPasien() {
             label="Nama Lengkap"
             name="nama"
             value={formData.nama}
-            onChange={handleChange}
-            required
-            sx={{
-              mb: 3,
-              '& .MuiOutlinedInput-root': {
-                borderRadius: 2,
-                '&:hover fieldset': {
-                  borderColor: '#667eea'
-                },
-                '&.Mui-focused fieldset': {
-                  borderColor: '#667eea'
-                }
-              },
-              '& .MuiInputLabel-root.Mui-focused': {
-                color: '#667eea'
-              }
-            }}
-          />
-
-          <TextField
-            fullWidth
-            label="NIK"
-            name="nik"
-            value={formData.nik}
             onChange={handleChange}
             required
             sx={{
