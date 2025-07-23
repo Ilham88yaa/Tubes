@@ -3,10 +3,11 @@ const mongoose = require('mongoose'); // Import mongoose di sini
 
 exports.createRekamMedis = async (req, res) => {
   try {
-    const { pasienId, tanggal, keluhan, diagnosa, tindakan, dokter } = req.body;
+    const { pasienId, nama_pasien, tanggal, keluhan, diagnosa, tindakan, dokter } = req.body;
 
     // ✅ Tambahkan logging untuk melihat data yang masuk dari frontend
     console.log('[REKAM_CONTROLLER] Menerima data untuk createRekamMedis:', req.body);
+    console.log('[REKAM_CONTROLLER] Destructured nama_pasien:', nama_pasien); // Log ini
 
     // ✅ Lakukan validasi dasar untuk field wajib
     if (!pasienId || !tanggal || !keluhan || !diagnosa || !tindakan || !dokter) {
@@ -36,6 +37,7 @@ exports.createRekamMedis = async (req, res) => {
     // Buat instansi RekamMedis baru
     const rekam = new RekamMedis({
         pasienId: new mongoose.Types.ObjectId(pasienId), // Gunakan ObjectId yang sudah divalidasi
+        nama_pasien: nama_pasien,
         tanggal: parsedTanggal, // Gunakan objek Date yang sudah diparse
         keluhan,
         diagnosa,

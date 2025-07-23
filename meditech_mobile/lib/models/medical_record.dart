@@ -1,19 +1,20 @@
-// meditech_mobile/lib/models/medical_record.dart
-// Tidak perlu import 'package:flutter/material.dart'; atau 'dart:convert'; jika tidak digunakan langsung di file ini
+// C:\TUGAS ULBI SEMESTER 4\Tubes\meditech_mobile\lib\models\medical_record.dart
 
 class MedicalRecord {
-  final String id;          // Tambahkan ini untuk _id dari MongoDB
-  final String pasienId;    // Tambahkan ini
-  final DateTime tanggal;   // ✅ Sesuai dengan nama field di MongoDB
-  final String keluhan;     // ✅ Sesuai dengan nama field di MongoDB
-  final String diagnosa;    // ✅ Sesuai dengan nama field di MongoDB
-  final String tindakan;    // ✅ Sesuai dengan nama field di MongoDB
-  final String dokter;      // ✅ Sesuai dengan nama field di MongoDB
-  // Anda bisa menambahkan createdAt dan updatedAt jika ingin menampilkannya
+  final String id;
+  final String pasienId;
+  final String namaPasien; // ✅ Tambahkan field ini
+  final DateTime tanggal;
+  final String keluhan;
+  final String diagnosa;
+  final String tindakan;
+  final String dokter;
+  // Tambahkan field lain yang ada di database Anda jika perlu (misal createdAt, updatedAt jika ditampilkan)
 
   MedicalRecord({
     required this.id,
     required this.pasienId,
+    required this.namaPasien, // ✅ Tambahkan ke konstruktor
     required this.tanggal,
     required this.keluhan,
     required this.diagnosa,
@@ -23,13 +24,16 @@ class MedicalRecord {
 
   factory MedicalRecord.fromJson(Map<String, dynamic> json) {
     return MedicalRecord(
-      id: json['_id'] as String, // Mengambil _id dari MongoDB
-      pasienId: json['pasienId'] as String, // Mengambil pasienId
-      tanggal: DateTime.parse(json['tanggal'] as String), // Parsing 'tanggal' dari MongoDB
-      keluhan: json['keluhan'] as String, // Mengambil 'keluhan'
-      diagnosa: json['diagnosa'] as String, // Mengambil 'diagnosa'
-      tindakan: json['tindakan'] as String, // Mengambil 'tindakan'
-      dokter: json['dokter'] as String, // Mengambil 'dokter'
+      id: json['_id'] as String,
+      pasienId: json['pasienId'] as String,
+      // ✅ Gunakan ?? '' untuk String agar aman dari null, dan parse nama_pasien
+      namaPasien: json['nama_pasien'] as String? ?? '', // Ambil dari 'nama_pasien' di JSON
+      // ✅ Pastikan parsing tanggal aman. Jika null, fallback ke tanggal default (misal DateTime.now())
+      tanggal: DateTime.tryParse(json['tanggal'] as String? ?? '') ?? DateTime.now(),
+      keluhan: json['keluhan'] as String? ?? '',
+      diagnosa: json['diagnosa'] as String? ?? '',
+      tindakan: json['tindakan'] as String? ?? '',
+      dokter: json['dokter'] as String? ?? '',
     );
   }
 
@@ -38,6 +42,7 @@ class MedicalRecord {
     return {
       '_id': id,
       'pasienId': pasienId,
+      'nama_pasien': namaPasien, // ✅ Tambahkan ke toJson
       'tanggal': tanggal.toIso8601String(),
       'keluhan': keluhan,
       'diagnosa': diagnosa,

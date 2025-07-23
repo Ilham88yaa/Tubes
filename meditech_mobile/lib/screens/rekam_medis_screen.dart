@@ -121,7 +121,7 @@ class _RekamMedisScreenState extends State<RekamMedisScreen> {
       final result = await RekamMedisService.createRekamMedis(
         pasienId: widget.currentPasien.id!,
         // ✅ TAMBAHKAN INI: kirim nama_pasien dari objek pasien yang login
-        nama_pasien: widget.currentPasien.nama, // Asumsi widget.currentPasien.nama tidak null
+        nama_pasien: widget.currentPasien.nama!, // Asumsi widget.currentPasien.nama tidak null
         tanggal: _selectedDate!,
         keluhan: _keluhanController.text,
         diagnosa: _diagnosaController.text,
@@ -288,6 +288,7 @@ class _RekamMedisScreenState extends State<RekamMedisScreen> {
                             ),
                           ),
                           const SizedBox(height: 8),
+                          Text('Nama Pasien: ${record.namaPasien}'),
                           Text('Diagnosa: ${record.diagnosa}'),
                           Text('Tindakan: ${record.tindakan}'),
                           const SizedBox(height: 4),
