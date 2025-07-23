@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class PasienService {
-  static const String baseUrl = 'http://172.16.0.2:5001/api';
+  static const String baseUrl = 'http://localhost:5001/api';
 
   /// Login pasien (Auth)
   static Future<Map<String, dynamic>> login(

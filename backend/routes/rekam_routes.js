@@ -5,8 +5,10 @@ const rekamController = require('../controllers/rekam_controller');
 // [POST] Tambah rekam medis
 router.post('/', rekamController.createRekamMedis);
 
-// [GET] Ambil semua rekam medis
+// [GET] Ambil semua rekam medis (untuk admin atau keperluan lain)
 router.get('/', rekamController.getAllRekamMedis);
-router.get('/pasien/:id', rekamController.getByPasienId);
+
+// ✅ KOREKSI INI: Ubah '/pasien/:id' menjadi '/user/:id'
+router.get('/user/:id', rekamController.getByPasienId); // Pastikan ini sesuai dengan panggilan Flutter
 
 module.exports = router;

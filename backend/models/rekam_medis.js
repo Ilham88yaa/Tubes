@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const rekamMedisSchema = new mongoose.Schema({
+  pasienId: { // ✅ TAMBAHKAN FIELD INI
+    type: mongoose.Schema.Types.ObjectId, // Tipe ObjectId untuk referensi ke user
+    ref: 'User', // Menunjukkan bahwa ini merujuk ke model 'User'
+    required: true // Wajib diisi
+  },
   nama_pasien: {
     type: String,
     required: true
@@ -18,9 +23,11 @@ const rekamMedisSchema = new mongoose.Schema({
     required: true
   },
   tanggal: {
-    type: String,
-    required: true
+    type: Date,
+    default: Date.now
   }
+}, {
+  timestamps: true // ✅ Opsional, bagus untuk createdAt dan updatedAt otomatis
 });
 
 module.exports = mongoose.model('RekamMedis', rekamMedisSchema);
