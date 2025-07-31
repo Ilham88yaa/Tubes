@@ -1,18 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-const AdminSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-});
-
+// ✅ Schema utama untuk semua user (admin, dokter, pasien)
 const userSchema = new mongoose.Schema({
   nama: {
     type: String,
@@ -42,8 +31,6 @@ const userSchema = new mongoose.Schema({
     enum: ['pasien', 'dokter', 'admin'],
     default: 'pasien',
   },
-
-  // Khusus untuk pasien
   appointments: [
     {
       date: String,
@@ -57,14 +44,9 @@ const userSchema = new mongoose.Schema({
       date: String,
     }
   ]
-<<<<<<< HEAD:backend/models/user.js
-
-
-=======
->>>>>>> 3572669 (integrasi admin):backend/models/user_model.js
 }, { timestamps: true });
 
-// Hash password sebelum menyimpan
+// 🔐 Hash password sebelum disimpan
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   try {
@@ -76,7 +58,7 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-// Method untuk membandingkan password saat login
+// 🔑 Metode untuk membandingkan password saat login
 userSchema.methods.comparePassword = function (inputPassword) {
   return bcrypt.compare(inputPassword, this.password);
 };

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import AdminLogin from "./pages/admin_login";   // halaman login admin
 import Dashboard from "./pages/dashboard";       // dashboard utama
-import { getAllRekamMedis } from "./services/rekam_service"; // jika digunakan
+import { getAllRekamMedis } from "./services/rekam_services";
 
 function App() {
   const [loggedIn, setLoggedIn] = useState(false);

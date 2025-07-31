@@ -5,7 +5,6 @@ import {
   Event as EventIcon,
   MedicalServices as MedicalServicesIcon,
 } from '@mui/icons-material';
-import RegistrasiPasien from './registrasi_pasien';
 import JadwalKonsultasi from './jadwal_konsultasi';
 import RekamMedis from './rekam_medis';
 import PasienList from './user_list';
@@ -31,7 +30,6 @@ export default function Dashboard() {
   }, [navigate]);
 
   const menuItems = [
-    { text: 'Registrasi Pasien', icon: <PeopleIcon />, component: <RegistrasiPasien /> },
     { text: 'Jadwal Konsultasi', icon: <EventIcon />, component: <JadwalKonsultasi /> },
     { text: 'Rekam Medis', icon: <MedicalServicesIcon />, component: <RekamMedis /> },
     ...(role === 'admin' ? [

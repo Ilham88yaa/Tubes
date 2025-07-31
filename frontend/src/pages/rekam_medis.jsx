@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
-import { getAllRekamMedis } from "../services/rekam_service";
+import { getAllRekamMedis } from "../services/rekam_services";
 
 export default function RekamMedis() {
   const [data, setData] = useState([]);

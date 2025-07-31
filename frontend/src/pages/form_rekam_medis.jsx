@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Paper, TextField, Button, Typography } from '@mui/material';
-import { createRekamMedis } from '../services/rekam_service';
+import { createRekamMedis } from '../services/rekam_services';
 
 export default function FormRekamMedis() {
   const [form, setForm] = useState({

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Paper, TextField, Button, Typography } from '@mui/material';
 import { createJadwal } from '../services/jadwal_services'; // ✅ gunakan file yang benar
-import { getAllBookings } from '../services/booking_service'; // ✅ asumsi file ini memang ada
+import { getAllBookings } from '../services/booking_services'; // ✅ asumsi file ini memang ada
 
 export default function FormBooking() {
   const [bookings, setBookings] = useState([]);
