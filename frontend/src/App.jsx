@@ -1,42 +1,56 @@
-import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import AdminLogin from "./pages/admin_login";   // halaman login admin
-import Dashboard from "./pages/dashboard";       // dashboard utama
-import { getAllRekamMedis } from "./services/rekam_services";
+import React from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation
+} from "react-router-dom";
+import AdminLogin from "./pages/admin_login";
+import Dashboard from "./pages/dashboard";
+
+// Komponen proteksi halaman
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem("adminToken");
+  const location = useLocation();
+
+  if (!token) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+}
+
+// Komponen login wrapper agar redirect jika sudah login
+function LoginRoute() {
+  const token = localStorage.getItem("adminToken");
+
+  if (token) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <AdminLogin />;
+}
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem('adminToken'); // ambil token dari localStorage
-    setLoggedIn(!!token); // true jika token ada
-  }, []);
-
   return (
     <Router>
       <Routes>
-        {/* Route Login */}
-        <Route
-          path="/login"
-          element={
-            loggedIn
-              ? <Navigate to="/" />
-              : <AdminLogin onLoginSuccess={() => setLoggedIn(true)} />
-          }
-        />
+        {/* Login route */}
+        <Route path="/login" element={<LoginRoute />} />
 
-        {/* Route Dashboard */}
+        {/* Dashboard */}
         <Route
           path="/"
           element={
-            loggedIn
-              ? <Dashboard />
-              : <Navigate to="/login" />
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
           }
         />
 
-        {/* Route fallback */}
-        <Route path="*" element={<Navigate to="/" />} />
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

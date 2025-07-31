@@ -1,20 +1,44 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Button, TextField, Typography, Snackbar, Alert } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; // tambahkan ini
 
 export default function AdminLogin({ onLoginSuccess }) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
+  const navigate = useNavigate(); // tambahkan ini
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post('http://localhost:5001/api/admin/login', { username, password });
-      localStorage.setItem('adminToken', res.data.token);
-      setSnackbar({ open: true, message: 'Login berhasil', severity: 'success' });
-      onLoginSuccess(); // callback untuk masuk ke dashboard
+      const res = await axios.post('http://localhost:5001/api/admin/login', { username, password }); // gunakan URL penuh agar pasti benar
+      console.log('Login response:', res.data);
+
+      if (res.data && res.data.token) {
+        localStorage.setItem('adminToken', res.data.token);
+        localStorage.setItem('role', 'admin'); // optional
+
+        setSnackbar({ open: true, message: 'Login berhasil', severity: 'success' });
+
+        // Navigasi ke dashboard setelah login sukses
+        setTimeout(() => {
+          if (onLoginSuccess) {
+            onLoginSuccess(); // jika props dipakai
+          } else {
+            navigate('/'); // fallback langsung ke dashboard
+          }
+        }, 800);
+      } else {
+        throw new Error('Login tidak valid: token kosong');
+      }
     } catch (err) {
-      setSnackbar({ open: true, message: 'Login gagal', severity: 'error' });
+      console.error('LOGIN ERROR:', err?.response?.data || err.message || err);
+
+      setSnackbar({
+        open: true,
+        message: 'Login gagal: ' + (err?.response?.data?.message || err.message || 'Unknown error'),
+        severity: 'error',
+      });
     }
   };
 
