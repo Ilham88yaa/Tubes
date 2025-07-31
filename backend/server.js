@@ -9,8 +9,11 @@ const bookingRoutes = require('./routes/booking_routes');
 const jadwalRoutes = require('./routes/jadwal_routes');
 const rekamRoutes = require('./routes/rekam_routes');
 const userRoutes = require('./routes/user_routes');
+<<<<<<< HEAD
 const konsultasiRoute = require('./routes/konsultasi');
 const adminRoutes = require('./routes/admin_routes');
+=======
+>>>>>>> 3572669 (integrasi admin)
 
 dotenv.config();
 const app = express();

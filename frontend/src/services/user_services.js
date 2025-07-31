@@ -1,13 +1,12 @@
-// src/services/user_service.js
 import axios from 'axios';
 
-// Ganti URL sesuai dengan alamat backend-mu
-const BASE_URL = 'http://localhost:5001/api/user'; 
+// ✅ Ganti URL sesuai dengan alamat backend-mu
+const BASE_URL = 'http://localhost:5001/api';
 
-// ✅ Ambil semua user
+// ✅ Ambil semua user (role: pasien)
 export const getAllUser = async () => {
   try {
-    const response = await axios.get(BASE_URL); // GET /api/user
+    const response = await axios.get(`${BASE_URL}/user/pasien`); // GET /api/user/pasien
     return response.data;
   } catch (error) {
     console.error('[getAllUser] Error:', error);
@@ -15,10 +14,10 @@ export const getAllUser = async () => {
   }
 };
 
-// ✅ Tambah user baru (tidak dipakai di admin tapi bisa untuk testing)
+// ✅ Tambah user baru
 export const createUser = async (data) => {
   try {
-    const response = await axios.post(`${BASE_URL}/register`, data); // POST /api/user/register
+    const response = await axios.post(`${BASE_URL}/user/register`, data); // POST /api/user/register
     return response.data;
   } catch (error) {
     console.error('[createUser] Error:', error);
@@ -29,7 +28,7 @@ export const createUser = async (data) => {
 // ✅ Update user berdasarkan ID
 export const updateUser = async (id, data) => {
   try {
-    const response = await axios.put(`${BASE_URL}/${id}`, data); // PUT /api/user/:id
+    const response = await axios.put(`${BASE_URL}/user/${id}`, data); // PUT /api/user/:id
     return response.data;
   } catch (error) {
     console.error('[updateUser] Error:', error);
@@ -40,7 +39,7 @@ export const updateUser = async (id, data) => {
 // ✅ Hapus user berdasarkan ID
 export const deleteUser = async (id) => {
   try {
-    const response = await axios.delete(`${BASE_URL}/${id}`); // DELETE /api/user/:id
+    const response = await axios.delete(`${BASE_URL}/user/${id}`); // DELETE /api/user/:id
     return response.data;
   } catch (error) {
     console.error('[deleteUser] Error:', error);

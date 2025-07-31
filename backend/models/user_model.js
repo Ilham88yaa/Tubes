@@ -43,7 +43,7 @@ const userSchema = new mongoose.Schema({
     default: 'pasien',
   },
 
-  // HANYA digunakan kalau role === 'pasien'
+  // Khusus untuk pasien
   appointments: [
     {
       date: String,
@@ -57,11 +57,14 @@ const userSchema = new mongoose.Schema({
       date: String,
     }
   ]
+<<<<<<< HEAD:backend/models/user.js
 
 
+=======
+>>>>>>> 3572669 (integrasi admin):backend/models/user_model.js
 }, { timestamps: true });
 
-// 🔐 Hash password sebelum menyimpan
+// Hash password sebelum menyimpan
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
   try {
@@ -73,7 +76,7 @@ userSchema.pre('save', async function (next) {
   }
 });
 
-// 🔐 Method membandingkan password
+// Method untuk membandingkan password saat login
 userSchema.methods.comparePassword = function (inputPassword) {
   return bcrypt.compare(inputPassword, this.password);
 };

@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const User = require('../models/user_model');
 const jwt = require('jsonwebtoken');
 
 // 🔐 REGISTER
@@ -107,3 +107,22 @@ exports.getAllAdmin = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+<<<<<<< HEAD
+=======
+
+
+// controllers/user_controller.js
+exports.createUser = async (req, res) => {
+  try {
+    const { nama, nik, tanggal_lahir, alamat, no_hp } = req.body;
+
+    // Simpan ke database, misalnya:
+    const newUser = await User.create({ nama, nik, tanggal_lahir, alamat, no_hp });
+
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Gagal mendaftarkan pasien' });
+  }
+};
+>>>>>>> 3572669 (integrasi admin)

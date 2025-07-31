@@ -1,9 +1,10 @@
-
-import React, { useState } from 'react';
-import { Box, CssBaseline, Drawer, AppBar, Toolbar, Typography, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import PeopleIcon from '@mui/icons-material/People';
-import EventIcon from '@mui/icons-material/Event';
-import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  People as PeopleIcon,
+  Event as EventIcon,
+  MedicalServices as MedicalServicesIcon,
+} from '@mui/icons-material';
 import RegistrasiPasien from './registrasi_pasien';
 import JadwalKonsultasi from './jadwal_konsultasi';
 import RekamMedis from './rekam_medis';
@@ -11,46 +12,37 @@ import PasienList from './user_list';
 import FormBooking from './form_booking';
 import FormRekamMedis from './form_rekam_medis';
 
-
-
-
 const drawerWidth = 220;
 
-
-const menuItems = [
-  { text: 'Registrasi Pasien', icon: <PeopleIcon /> },
-  { text: 'Jadwal Konsultasi', icon: <EventIcon /> },
-  { text: 'Rekam Medis', icon: <MedicalServicesIcon /> },
-  { text: 'Daftar Pasien', icon: <PeopleIcon /> },
-  { text: 'Booking Konsultasi', icon: <EventIcon /> },
-  { text: 'Input Rekam Medis', icon: <MedicalServicesIcon /> },
-];
-
-
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [selectedMenu, setSelectedMenu] = useState(0);
+  const [role, setRole] = useState(null);
 
-  const renderContent = () => {
-    switch (selectedMenu) {
-      case 0:
-        return <RegistrasiPasien />;
-      case 1:
-        return <JadwalKonsultasi />;
-      case 2:
-        return <RekamMedis />;
-      case 3:
-        return <PasienList />;
-      case 4:
-        return <FormBooking />;
-      case 5:
-        return <FormRekamMedis />;
-      default:
-        return null;
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const storedRole = localStorage.getItem('role');
+    setRole(storedRole);
+
+    if (!token) {
+      alert('Silakan login terlebih dahulu.');
+      navigate('/login');
     }
-  };
+  }, [navigate]);
+
+  const menuItems = [
+    { text: 'Registrasi Pasien', icon: <PeopleIcon />, component: <RegistrasiPasien /> },
+    { text: 'Jadwal Konsultasi', icon: <EventIcon />, component: <JadwalKonsultasi /> },
+    { text: 'Rekam Medis', icon: <MedicalServicesIcon />, component: <RekamMedis /> },
+    ...(role === 'admin' ? [
+      { text: 'Daftar Pasien', icon: <PeopleIcon />, component: <PasienList /> },
+      { text: 'Booking Konsultasi', icon: <EventIcon />, component: <FormBooking /> },
+      { text: 'Input Rekam Medis', icon: <MedicalServicesIcon />, component: <FormRekamMedis /> },
+    ] : [])
+  ];
 
   return (
-    <div style={{ display: 'flex', fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+    <div style={{ display: 'flex', fontFamily: 'Segoe UI, Roboto, sans-serif' }}>
       {/* App Bar */}
       <div style={{
         position: 'fixed',
@@ -101,7 +93,7 @@ export default function Dashboard() {
                 borderRadius: '12px',
                 cursor: 'pointer',
                 transition: 'all 0.3s ease',
-                background: selectedMenu === index 
+                background: selectedMenu === index
                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                   : 'transparent',
                 color: selectedMenu === index ? 'white' : '#374151',
@@ -109,19 +101,19 @@ export default function Dashboard() {
               }}
               onMouseEnter={(e) => {
                 if (selectedMenu !== index) {
-                  e.target.style.background = 'rgba(102, 126, 234, 0.1)';
-                  e.target.style.transform = 'translateX(4px)';
+                  e.currentTarget.style.background = 'rgba(102, 126, 234, 0.1)';
+                  e.currentTarget.style.transform = 'translateX(4px)';
                 }
               }}
               onMouseLeave={(e) => {
                 if (selectedMenu !== index) {
-                  e.target.style.background = 'transparent';
-                  e.target.style.transform = 'translateX(0)';
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.transform = 'translateX(0)';
                 }
               }}
             >
-              <span style={{ 
-                fontSize: '1.2rem', 
+              <span style={{
+                fontSize: '1.2rem',
                 marginRight: '12px',
                 filter: selectedMenu === index ? 'brightness(0) invert(1)' : 'none'
               }}>
@@ -143,11 +135,8 @@ export default function Dashboard() {
         background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
         flexGrow: 1
       }}>
-        <div style={{
-          padding: '24px',
-          background: 'transparent'
-        }}>
-          {renderContent()}
+        <div style={{ padding: '24px' }}>
+          {menuItems[selectedMenu]?.component}
         </div>
       </div>
     </div>

@@ -11,7 +11,7 @@ import {
   DialogTitle,
   TextField,
 } from '@mui/material';
-import { getAllUser, updateUser, deleteUser } from '../services/user_service';
+import { getAllUser, updateUser, deleteUser } from '../services/user_services';
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
@@ -22,8 +22,17 @@ export default function UserList() {
 
   const fetchUsers = async () => {
     try {
-      const response = await getAllUser();
-      setUsers(response);
+      const role = localStorage.getItem('role');
+      const email = localStorage.getItem('email');
+      const data = await getAllUser();
+
+      if (role === 'admin') {
+        setUsers(data); // Admin melihat semua user
+      } else {
+        // Pasien hanya melihat datanya sendiri
+        const user = data.find((u) => u.email === email);
+        setUsers(user ? [user] : []);
+      }
     } catch (err) {
       console.error('Gagal mengambil data user:', err);
     }
@@ -124,7 +133,6 @@ export default function UserList() {
         message={snackbarMsg}
       />
 
-      {/* Modal Edit */}
       <Dialog open={openEdit} onClose={() => setOpenEdit(false)}>
         <DialogTitle>Edit User</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>

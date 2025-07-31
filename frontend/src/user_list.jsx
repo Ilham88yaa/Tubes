@@ -7,16 +7,37 @@ const res = await axios.get('http://localhost:5001/api/user', {
 });
 
 export const getAllPasien = async () => {
-  const res = await axios.get(API);
+  const token = localStorage.getItem("token");
+
+  const res = await axios.get("http://localhost:5001/api/user/pasien", {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
   return res.data;
 };
 
 export const updatePasien = async (id, data) => {
-  const res = await axios.put(`${API}/${id}`, data);
+  const token = localStorage.getItem("token");
+
+  const res = await axios.put(`${API}/${id}`, data, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
   return res.data;
 };
 
 export const deletePasien = async (id) => {
-  const res = await axios.delete(`${API}/${id}`);
+  const token = localStorage.getItem("token");
+
+  const res = await axios.delete(`${API}/${id}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
   return res.data;
 };
