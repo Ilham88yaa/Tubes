@@ -1,33 +1,37 @@
 const mongoose = require('mongoose');
 
 const rekamMedisSchema = new mongoose.Schema({
-  pasienId: { // ✅ TAMBAHKAN FIELD INI
+  pasienId: { // Field untuk ID pasien
     type: mongoose.Schema.Types.ObjectId, // Tipe ObjectId untuk referensi ke user
-    ref: 'User', // Menunjukkan bahwa ini merujuk ke model 'User'
+    ref: 'User', // Merujuk ke model 'User'
     required: true // Wajib diisi
   },
-  nama_pasien: {
+  nama_pasien: { // Nama pasien (disimpan sebagai string untuk kemudahan display)
     type: String,
     required: true
   },
-  keluhan: {
+  keluhan: { // Keluhan pasien
     type: String,
     required: true
   },
-  diagnosa: {
+  diagnosa: { // Diagnosa dokter
     type: String,
     required: true
   },
-  tindakan: {
+  tindakan: { // Tindakan yang diberikan
     type: String,
     required: true
   },
-  tanggal: {
+  tanggal: { // Tanggal konsultasi/rekam medis
     type: Date,
-    default: Date.now
+    default: Date.now // Default ke tanggal saat inicd |app
+  },
+  dokter: { // Nama dokter yang menangani
+    type: String,
+    required: true // Ubah ke `false` jika nama dokter boleh kosong
   }
-}, {
-  timestamps: true // ✅ Opsional, bagus untuk createdAt dan updatedAt otomatis
+}, { // ✅ INI ADALAH OBJEK OPSI KEDUA DARI new mongoose.Schema()
+  timestamps: true // Otomatis menambahkan createdAt dan updatedAt
 });
 
 module.exports = mongoose.model('RekamMedis', rekamMedisSchema);

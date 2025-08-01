@@ -14,18 +14,21 @@ class RekamMedisScreen extends StatefulWidget {
 }
 
 class _RekamMedisScreenState extends State<RekamMedisScreen> {
-  // ✅ Controllers untuk TextField input data rekam medis baru
+  // Controllers untuk TextField input data rekam medis baru
   final TextEditingController _keluhanController = TextEditingController();
   final TextEditingController _diagnosaController = TextEditingController();
   final TextEditingController _tindakanController = TextEditingController();
   final TextEditingController _dokterController = TextEditingController();
-  DateTime?
-  _selectedDate; // ✅ State untuk menyimpan tanggal konsultasi yang dipilih
+  DateTime? _selectedDate; // State untuk menyimpan tanggal konsultasi yang dipilih
 
   // State untuk data rekam medis yang akan ditampilkan
   List<MedicalRecord> records = [];
   bool isLoading = true; // Indikator loading saat mengambil data
   String? errorMessage; // Pesan error jika terjadi kesalahan
+
+  // State dan controller untuk fitur pencarian
+  final TextEditingController _searchController = TextEditingController();
+  String searchQuery = '';
 
   @override
   void initState() {
@@ -252,65 +255,168 @@ class _RekamMedisScreenState extends State<RekamMedisScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Filter records berdasarkan searchQuery
+    final filteredRecords = records.where((record) {
+      final query = searchQuery.toLowerCase();
+      return record.namaPasien.toLowerCase().contains(query) ||
+             record.keluhan.toLowerCase().contains(query) ||
+             record.diagnosa.toLowerCase().contains(query) ||
+             record.dokter.toLowerCase().contains(query);
+    }).toList();
+
     return Scaffold(
       appBar: AppBar(title: const Text('Rekam Medis')),
-      body:
-          isLoading // Menampilkan CircularProgressIndicator saat data sedang dimuat
-              ? const Center(child: CircularProgressIndicator())
-              : errorMessage !=
-                  null // Menampilkan pesan error jika terjadi kesalahan
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : errorMessage != null
               ? Center(child: Text(errorMessage!))
-              : records
-                  .isEmpty // Menampilkan pesan jika tidak ada catatan medis ditemukan
-              ? const Center(child: Text('Tidak ada catatan medis ditemukan.'))
-              : ListView.builder(
-                // Menampilkan daftar rekam medis jika ada data
-                itemCount: records.length,
-                itemBuilder: (context, index) {
-                  // Menampilkan data terbaru di paling atas
-                  final record = records.reversed.toList()[index];
-                  return Card(
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: Padding(
+              : Column(
+                  children: [
+                    Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            record
-                                .keluhan, // Keluhan sebagai judul utama rekam medis
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text('Nama Pasien: ${record.namaPasien}'),
-                          Text('Diagnosa: ${record.diagnosa}'),
-                          Text('Tindakan: ${record.tindakan}'),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Tanggal: ${DateFormat('dd-MM-yyyy').format(record.tanggal)}',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          Text('Dokter: ${record.dokter}'),
-                        ],
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          labelText: 'Cari riwayat medis...',
+                          prefixIcon: Icon(Icons.search),
+                          border: OutlineInputBorder(),
+                        ),
+                        onChanged: (value) {
+                          setState(() {
+                            searchQuery = value;
+                          });
+                        },
                       ),
                     ),
-                  );
-                },
-              ),
-      // ✅ FloatingActionButton untuk membuka form input data baru
+                    Expanded(
+                      child: filteredRecords.isEmpty
+                          ? const Center(child: Text('Tidak ada catatan medis ditemukan.'))
+                          : ListView.builder(
+                              itemCount: filteredRecords.length,
+                              itemBuilder: (context, index) {
+                                final record = filteredRecords.reversed.toList()[index];
+                                return Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.08),
+                                        blurRadius: 12,
+                                        offset: Offset(0, 6),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(18.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(Icons.medical_services, color: Colors.white, size: 28),
+                                            const SizedBox(width: 10),
+                                            Expanded(
+                                              child: Text(
+                                                record.keluhan,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.person, color: Colors.white70, size: 20),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              record.namaPasien,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: 15,
+                                                color: Colors.white70,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.calendar_today, color: Colors.white70, size: 18),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              DateFormat('dd MMM yyyy').format(record.tanggal),
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.white70,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.local_hospital, color: Colors.white70, size: 18),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              'Dokter: ${record.dokter}',
+                                              style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.white70,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 10),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white.withOpacity(0.15),
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Diagnosa: ${record.diagnosa}',
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                'Tindakan: ${record.tindakan}',
+                                                style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddRecordDialog, // Ketika tombol diklik, panggil dialog
-        child: const Icon(Icons.add), // Icon tambah
-        tooltip: 'Tambah Rekam Medis Baru', // Tooltip saat tombol ditekan lama
+        onPressed: _showAddRecordDialog,
+        child: const Icon(Icons.add),
+        tooltip: 'Tambah Rekam Medis Baru',
       ),
     );
   }
@@ -322,6 +428,7 @@ class _RekamMedisScreenState extends State<RekamMedisScreen> {
     _diagnosaController.dispose();
     _tindakanController.dispose();
     _dokterController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 }
