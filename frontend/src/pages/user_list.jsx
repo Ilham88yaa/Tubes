@@ -1,44 +1,40 @@
 import React, { useEffect, useState } from 'react';
-import { getAllUser, updateUser, deleteUser } from '../services/user_service';
+import { DataGrid } from '@mui/x-data-grid';
 import {
-  Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Box, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle
+  Button,
+  Snackbar,
+  Typography,
+  Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
 } from '@mui/material';
+import { getAllUser, updateUser, deleteUser } from '../services/user_services';
 
-const UserList = () => {
+export default function UserList() {
   const [users, setUsers] = useState([]);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMsg, setSnackbarMsg] = useState('');
   const [openEdit, setOpenEdit] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
-  const fetchData = () => {
-    getAllUser().then(data => setUsers(data));
-  };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const handleEditClick = (user) => {
-    setSelectedUser(user);
-    setOpenEdit(true);
-  };
-
-  const handleEditChange = (e) => {
-    setSelectedUser({
-      ...selectedUser,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleEditSubmit = async () => {
+  const fetchUsers = async () => {
     try {
-      await updateUser(selectedUser._id, selectedUser);
-      setOpenEdit(false);
-      fetchData();
-      alert('Data user berhasil diupdate');
+      const role = localStorage.getItem('role');
+      const email = localStorage.getItem('email');
+      const data = await getAllUser();
+
+      if (role === 'admin') {
+        setUsers(data); // Admin melihat semua user
+      } else {
+        // Pasien hanya melihat datanya sendiri
+        const user = data.find((u) => u.email === email);
+        setUsers(user ? [user] : []);
+      }
     } catch (err) {
-      console.error(err);
-      alert('Gagal mengupdate data user');
+      console.error('Gagal mengambil data user:', err);
     }
   };
 
@@ -46,62 +42,125 @@ const UserList = () => {
     if (window.confirm('Apakah Anda yakin ingin menghapus data user ini?')) {
       try {
         await deleteUser(id);
-        fetchData();
-        alert('Data user berhasil dihapus');
+        setSnackbarMsg('User berhasil dihapus');
+        setSnackbarOpen(true);
+        fetchUsers();
       } catch (err) {
-        console.error(err);
-        alert('Gagal menghapus data user');
+        console.error('Gagal menghapus:', err);
+        setSnackbarMsg('Gagal menghapus user');
+        setSnackbarOpen(true);
       }
     }
   };
 
+  const handleEditClick = (user) => {
+    setSelectedUser(user);
+    setOpenEdit(true);
+  };
+
+  const handleEditChange = (e) => {
+    setSelectedUser({ ...selectedUser, [e.target.name]: e.target.value });
+  };
+
+  const handleEditSubmit = async () => {
+    try {
+      await updateUser(selectedUser._id, selectedUser);
+      setSnackbarMsg('Data user berhasil diupdate');
+      setSnackbarOpen(true);
+      setOpenEdit(false);
+      fetchUsers();
+    } catch (err) {
+      console.error(err);
+      setSnackbarMsg('Gagal mengupdate data user');
+      setSnackbarOpen(true);
+    }
+  };
+
+  const columns = [
+    { field: '_id', headerName: 'ID', width: 150 },
+    { field: 'nama', headerName: 'Nama', width: 150 },
+    { field: 'email', headerName: 'Email', width: 200 },
+    { field: 'role', headerName: 'Role', width: 120 },
+    {
+      field: 'actions',
+      headerName: 'Aksi',
+      width: 200,
+      renderCell: (params) => (
+        <>
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={() => handleEditClick(params.row)}
+            sx={{ mr: 1 }}
+          >
+            Edit
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => handleDelete(params.row._id)}
+          >
+            Hapus
+          </Button>
+        </>
+      ),
+    },
+  ];
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
   return (
-    <Box sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>Daftar User</Typography>
+    <Box p={3}>
+      <Typography variant="h5" gutterBottom>
+        Daftar User
+      </Typography>
+      <Box height={450}>
+        <DataGrid
+          rows={users}
+          columns={columns}
+          pageSize={5}
+          getRowId={(row) => row._id}
+        />
+      </Box>
 
-      <TableContainer component={Paper} elevation={3}>
-        <Table>
-          <TableHead sx={{ backgroundColor: '#1976d2' }}>
-            <TableRow>
-              <TableCell sx={{ color: '#fff' }}>Nama</TableCell>
-              <TableCell sx={{ color: '#fff' }}>Email</TableCell>
-              <TableCell sx={{ color: '#fff' }}>Umur</TableCell>
-              <TableCell sx={{ color: '#fff' }}>Role</TableCell>
-              <TableCell sx={{ color: '#fff' }}>Aksi</TableCell>
-            </TableRow>
-          </TableHead>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMsg}
+      />
 
-          <TableBody>
-            {users.length > 0 ? (
-              users.map((u) => (
-                <TableRow key={u._id}>
-                  <TableCell>{u.nama}</TableCell>
-                  <TableCell>{u.email}</TableCell>
-                  <TableCell>{u.umur}</TableCell>
-                  <TableCell>{u.role}</TableCell>
-                  <TableCell>
-                    <Button variant="outlined" size="small" onClick={() => handleEditClick(u)}>Edit</Button>{' '}
-                    <Button variant="contained" color="error" size="small" onClick={() => handleDelete(u._id)}>Delete</Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell colSpan={5} align="center">Belum ada data user.</TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      {/* Modal Edit */}
       <Dialog open={openEdit} onClose={() => setOpenEdit(false)}>
         <DialogTitle>Edit User</DialogTitle>
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-          <TextField label="Nama" name="nama" value={selectedUser?.nama || ''} onChange={handleEditChange} />
-          <TextField label="Email" name="email" value={selectedUser?.email || ''} onChange={handleEditChange} />
-          <TextField label="Umur" name="umur" type="number" value={selectedUser?.umur || ''} onChange={handleEditChange} />
-          <TextField label="Role" name="role" value={selectedUser?.role || ''} onChange={handleEditChange} />
+          <TextField
+            label="Nama"
+            name="nama"
+            value={selectedUser?.nama || ''}
+            onChange={handleEditChange}
+          />
+          <TextField
+            label="Email"
+            name="email"
+            value={selectedUser?.email || ''}
+            onChange={handleEditChange}
+          />
+          <TextField
+            label="Umur"
+            name="umur"
+            type="number"
+            value={selectedUser?.umur || ''}
+            onChange={handleEditChange}
+          />
+          <TextField
+            label="Role"
+            name="role"
+            value={selectedUser?.role || ''}
+            onChange={handleEditChange}
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenEdit(false)}>Batal</Button>
@@ -110,6 +169,4 @@ const UserList = () => {
       </Dialog>
     </Box>
   );
-};
-
-export default UserList;
+}

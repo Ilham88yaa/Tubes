@@ -5,13 +5,6 @@ class KonsultasiService {
     await Future.delayed(const Duration(seconds: 2)); // simulasi delay
     return [
       Konsultasi(
-        namaPasien: 'Ilham',
-        namaDokter: 'dr. Indah',
-        tanggal: '2025-07-25',
-        jam: '10:00',
-        keluhan: 'Sakit kepala dan mual',
-      ),
-      Konsultasi(
         namaPasien: 'Hilal',
         namaDokter: 'dr. Rina',
         tanggal: '2025-07-26',

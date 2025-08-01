@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getAllJadwal } from '../services/jadwal_service';
+import { getAllJadwal } from '../services/jadwal_services';
 import { Typography, Paper, Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 
 export default function JadwalKonsultasi() {

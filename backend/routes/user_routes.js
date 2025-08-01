@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const userController = require('../controllers/user_controller'); // ✅ konsisten import controller
+const userController = require('../controllers/user_controller');
 
 // =====================
 // 🌐 TEST ROUTE
@@ -10,29 +10,23 @@ router.get('/test', (req, res) => {
 });
 
 // =====================
-// 🔐 REGISTER
+// 🔐 REGISTER & LOGIN
 // =====================
 router.post('/register', userController.register);
-
-// =====================
-// 🔑 LOGIN
-// =====================
 router.post('/login', userController.login);
 
+
 // =====================
-// 📋 GET all users by role
+// 📋 GET USER BY ROLE
+// =====================
 router.get('/pasien', userController.getAllPasien);
 router.get('/dokter', userController.getAllDokter);
 router.get('/admin', userController.getAllAdmin);
 
 // =====================
-// 📝 UPDATE USER
+// ✏️ UPDATE & DELETE USER
 // =====================
 router.put('/:id', userController.updateUser);
-
-// =====================
-// ❌ DELETE USER
-// =====================
 router.delete('/:id', userController.deleteUser);
 
 module.exports = router;

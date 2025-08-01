@@ -1,44 +1,66 @@
-import React, { useState } from 'react';
-import { createJadwal } from '../services/jadwal_service';
-import { Box, Paper, TextField, Button, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { getAllBookings } from '../services/booking_services'; // pastikan file dan ekspor sesuai
 
 export default function FormBooking() {
-  const [form, setForm] = useState({
-    nama: '',
-    dokter: '',
-    tanggal: '',
-    jam: ''
-  });
+  const [bookings, setBookings] = useState([]);
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value
-    });
-  };
+  useEffect(() => {
+    fetchBookings();
+  }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const fetchBookings = async () => {
     try {
-      await createJadwal(form);
-      alert('Booking berhasil disimpan');
-      setForm({ nama: '', dokter: '', tanggal: '', jam: '' });
-    } catch (err) {
-      console.error(err);
-      alert('Gagal menyimpan booking');
+      const data = await getAllBookings();
+      console.log('Fetched bookings:', data); // 👈 Debug log
+      if (Array.isArray(data)) {
+        setBookings(data);
+      } else {
+        console.warn('Data booking bukan array:', data);
+        setBookings([]);
+      }
+    } catch (error) {
+      console.error('Gagal ambil booking:', error);
+      setBookings([]); // fallback supaya map tidak error
     }
   };
 
   return (
-    <Paper sx={{ p: 3 }}>
-      <Typography variant="h5" gutterBottom>Form Booking Konsultasi</Typography>
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <TextField label="Nama Pasien" name="nama" value={form.nama} onChange={handleChange} required />
-        <TextField label="Dokter" name="dokter" value={form.dokter} onChange={handleChange} required />
-        <TextField label="Tanggal" type="date" name="tanggal" value={form.tanggal} onChange={handleChange} InputLabelProps={{ shrink: true }} required />
-        <TextField label="Jam" type="time" name="jam" value={form.jam} onChange={handleChange} InputLabelProps={{ shrink: true }} required />
-        <Button type="submit" variant="contained">Booking</Button>
-      </Box>
-    </Paper>
+    <Box sx={{ padding: 4 }}>
+      <Typography variant="h5" gutterBottom>
+        Data Booking Konsultasi
+      </Typography>
+
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow sx={{ backgroundColor: '#f0f4ff' }}>
+              <TableCell><b>Nama</b></TableCell>
+              <TableCell><b>Dokter</b></TableCell>
+              <TableCell><b>Tanggal</b></TableCell>
+              <TableCell><b>Jam</b></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {bookings.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  Tidak ada data booking.
+                </TableCell>
+              </TableRow>
+            ) : (
+              bookings.map((b, i) => (
+                <TableRow key={i}>
+                  <TableCell>{b.nama || '-'}</TableCell>
+                  <TableCell>{b.dokter || '-'}</TableCell>
+                  <TableCell>{b.tanggal || '-'}</TableCell>
+                  <TableCell>{b.jam || '-'}</TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 }

@@ -5,7 +5,9 @@ import '../models/booking.dart';
 import 'riwayat_booking_screen.dart';
 
 class BookingScreen extends StatefulWidget {
-  const BookingScreen({super.key});
+  final void Function(Booking) onBookingAdded;
+
+  const BookingScreen({super.key, required this.onBookingAdded});
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -182,6 +184,7 @@ class _BookingScreenState extends State<BookingScreen>
         setState(() {
           _bookingHistory.add(newBooking);
         });
+        widget.onBookingAdded(newBooking);
 
         _showSuccessSnackBar(
           'Booking berhasil! ${newBooking.nama} - ${newBooking.dokter}',

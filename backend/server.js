@@ -10,11 +10,12 @@ const jadwalRoutes = require('./routes/jadwal_routes');
 const rekamRoutes = require('./routes/rekam_routes');
 const userRoutes = require('./routes/user_routes');
 const konsultasiRoute = require('./routes/konsultasi');
+const adminRoutes = require('./routes/admin_routes');
 
 dotenv.config();
 const app = express();
 
-// Middleware CORS
+// CORS config
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
@@ -22,7 +23,7 @@ app.use(cors({
   credentials: true
 }));
 
-// Middleware untuk parsing body request
+// Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -35,7 +36,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// Root route
+// Test root
 app.get('/', (req, res) => {
   res.json({
     message: '🎉 Meditech Backend API is running!',
@@ -62,12 +63,13 @@ app.use('/api/booking', bookingRoutes);
 app.use('/api/jadwal', jadwalRoutes);
 app.use('/api/rekam_medis', rekamRoutes);
 app.use('/api/konsultasi', konsultasiRoute);
+app.use('/api/admin', adminRoutes);
 
-// Optional: backward compatibility
+// Optional backward compatibility
 app.use('/booking', bookingRoutes);
 app.use('/jadwal', jadwalRoutes);
 
-// Error handler middleware
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('Error:', err.message);
   console.error('Stack:', err.stack);
@@ -78,7 +80,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// 404 handler
+// 404 fallback
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
@@ -134,7 +136,7 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
-// Jalankan server
+// Run server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);

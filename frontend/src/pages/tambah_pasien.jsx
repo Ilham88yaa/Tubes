@@ -1,6 +1,6 @@
 // src/pages/TambahPasien.jsx
 import React, { useState } from 'react';
-import { tambahPasien } from '../services/pasien_service';
+import { tambahPasien } from '../services/user_services';
 
 const TambahPasien = () => {
   const [nama, setNama] = useState('');
