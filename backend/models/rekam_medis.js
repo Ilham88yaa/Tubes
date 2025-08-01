@@ -24,7 +24,11 @@ const rekamMedisSchema = new mongoose.Schema({
   },
   tanggal: { // Tanggal konsultasi/rekam medis
     type: Date,
-    default: Date.now
+    default: Date.now // Default ke tanggal saat ini
+  },
+  dokter: { // Nama dokter yang menangani
+    type: String,
+    required: true // Ubah ke false jika nama dokter boleh kosong
   }
 }, { // ✅ INI ADALAH OBJEK OPSI KEDUA DARI new mongoose.Schema()
   timestamps: true // Otomatis menambahkan createdAt dan updatedAt
